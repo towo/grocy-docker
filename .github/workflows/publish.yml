@@ -19,12 +19,12 @@ jobs:
     - run: sudo apt-get update
     - run: sudo apt-get install -y buildah qemu-user-static
     # Determine the grocy application version to bundle based on the image tag to publish
-    - run: echo "GROCY_VERSION=${{ env.GROCY_IMAGE_TAG }}" | sed -e "s/-[0-9a-f]*$//" >> $GITHUB_ENV
+    - run: echo "GROCY_VERSION=${{ env.GROCY_IMAGE_TAG }}" | sed -e "s/-[0-9a-z]*$//" >> $GITHUB_ENV
     # Build multi-architecture container manifests
     - id: build-grocy-backend
       uses: redhat-actions/buildah-build@v2.12
       with:
-        image: backend
+        image: grocy-backend
         tags: ${{ env.GROCY_IMAGE_TAG }} ${{ env.GROCY_VERSION }}
         platforms: linux/amd64, linux/arm64/v8
         containerfiles: Containerfile-backend
@@ -38,7 +38,7 @@ jobs:
     - id: build-grocy-frontend
       uses: redhat-actions/buildah-build@v2.12
       with:
-        image: frontend
+        image: grocy-frontend
         tags: ${{ env.GROCY_IMAGE_TAG }} ${{ env.GROCY_VERSION }}
         platforms: linux/amd64, linux/arm64/v8
         containerfiles: Containerfile-frontend
@@ -54,33 +54,13 @@ jobs:
       with:
         image: ${{ steps.build-grocy-backend.outputs.image }}
         tags: ${{ steps.build-grocy-backend.outputs.tags }}
-        registry: docker.io/towo/grocy
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        registry: docker.io/towo
+        username: ${{ vars.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     - uses: redhat-actions/push-to-registry@v2.7
       with:
         image: ${{ steps.build-grocy-frontend.outputs.image }}
         tags: ${{ steps.build-grocy-frontend.outputs.tags }}
-        registry: docker.io/towo/grocy
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        registry: docker.io/towo
+        username: ${{ vars.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-    # Perform vulnerability scanning
-    ## Note: please move this to *before* the container publish steps after confirming a way to use anchore/scan-action with locally-built OCI images
-    - id: scan-grocy-backend
-      uses: anchore/scan-action@v3
-      with:
-        image: docker.io/grocy/${{ steps.build-grocy-backend.outputs.image-with-tag }}
-        fail-build: false  # TODO: remove this when scan-action steps are moved to before container publish
-    - uses: github/codeql-action/upload-sarif@v2
-      with:
-        category: scan-grocy-backend
-        sarif_file: ${{ steps.scan-grocy-backend.outputs.sarif }}
-    - id: scan-grocy-frontend
-      uses: anchore/scan-action@v3
-      with:
-        image: docker.io/grocy/${{ steps.build-grocy-frontend.outputs.image-with-tag }}
-        fail-build: false  # TODO: remove this when scan-action steps are moved to before container publish
-    - uses: github/codeql-action/upload-sarif@v2
-      with:
-        category: scan-grocy-frontend
-        sarif_file: ${{ steps.scan-grocy-frontend.outputs.sarif }}

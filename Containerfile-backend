@@ -66,6 +66,10 @@ RUN     set -o pipefail && \
 RUN     composer install --no-interaction --no-dev --optimize-autoloader && \
         composer clear-cache
 
+VOLUME ["/var/www/data"]
+RUN     cp config-dist.php data/config.php
+
+
 # Remove build-time dependencies (privileged)
 USER root
 RUN     apk del \
@@ -74,7 +78,6 @@ RUN     apk del \
             gnupg \
             wget
 
-VOLUME ["/var/www/data"]
 
 EXPOSE 9000
 
