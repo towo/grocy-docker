@@ -19,7 +19,7 @@ jobs:
     - run: sudo apt-get update
     - run: sudo apt-get install -y buildah qemu-user-static
     # Determine the grocy application version to bundle based on the image tag to publish
-    - run: echo "GROCY_VERSION=${{ env.GROCY_IMAGE_TAG }}" | sed -e "s/-[0-9a-f]*$//" >> $GITHUB_ENV
+    - run: echo "GROCY_VERSION=${{ env.GROCY_IMAGE_TAG }}" | sed -e "s/-[0-9a-z]*$//" >> $GITHUB_ENV
     # Build multi-architecture container manifests
     - id: build-grocy-backend
       uses: redhat-actions/buildah-build@v2.12
