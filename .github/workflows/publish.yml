@@ -54,14 +54,14 @@ jobs:
       with:
         image: ${{ steps.build-grocy-backend.outputs.image }}
         tags: ${{ steps.build-grocy-backend.outputs.tags }}
-        registry: docker.io/grocy
+        registry: docker.io/towo/grocy
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     - uses: redhat-actions/push-to-registry@v2.7
       with:
         image: ${{ steps.build-grocy-frontend.outputs.image }}
         tags: ${{ steps.build-grocy-frontend.outputs.tags }}
-        registry: docker.io/grocy
+        registry: docker.io/towo/grocy
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     # Perform vulnerability scanning
