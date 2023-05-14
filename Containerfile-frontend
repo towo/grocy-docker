@@ -15,6 +15,7 @@ RUN     apk add --no-cache \
 # Install system dependencies
 RUN     apk update && \
         apk add --no-cache \
+            sudo \
             nginx
 
 # Configure directory permissions
