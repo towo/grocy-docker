@@ -4,4 +4,4 @@ if [ -n "${GROCY_DOCKER_BACKEND_HOST}" ]; then
 	cat /tmp/common.conf > /etc/nginx/common.conf;
 fi
 
-nginx -e /proc/self/fd/2 -g 'daemon off;'
+exec nginx -e /proc/self/fd/2 -g 'daemon off;'
