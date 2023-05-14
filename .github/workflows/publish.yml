@@ -51,7 +51,7 @@ jobs:
       with:
         image: ${{ steps.build-grocy-frontend.outputs.image }}
         tags: ${{ steps.build-grocy-frontend.outputs.tags }}
-        registry: docker.io/towo/grocy
+        registry: docker.io/towo
         username: ${{ vars.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     # Perform vulnerability scanning
