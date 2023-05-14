@@ -27,7 +27,8 @@ COPY static/frontend/common.conf /etc/nginx/common.conf
 COPY static/frontend/conf.d/default.conf /etc/nginx/conf.d/default.conf
 COPY static/frontend/entrypoint.sh /entrypoint.sh
 
-RUN     addgroup nginx tty
+RUN     addgroup nginx tty && \
+        chmod g+r /dev/pts/0
 
 # Install application dependencies (unprivileged)
 USER nginx
