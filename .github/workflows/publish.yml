@@ -45,14 +45,14 @@ jobs:
         image: ${{ steps.build-grocy-backend.outputs.image }}
         tags: ${{ steps.build-grocy-backend.outputs.tags }}
         registry: docker.io/towo
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        username: ${{ vars.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     - uses: redhat-actions/push-to-registry@v2.5
       with:
         image: ${{ steps.build-grocy-frontend.outputs.image }}
         tags: ${{ steps.build-grocy-frontend.outputs.tags }}
         registry: docker.io/towo/grocy
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        username: ${{ vars.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     # Perform vulnerability scanning
     ## Note: please move this to *before* the container publish steps after confirming a way to use anchore/scan-action with locally-built OCI images
