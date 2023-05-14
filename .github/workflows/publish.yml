@@ -24,7 +24,7 @@ jobs:
     - id: build-grocy-backend
       uses: redhat-actions/buildah-build@v2.12
       with:
-        image: backend
+        image: grocy-backend
         tags: ${{ env.GROCY_IMAGE_TAG }} ${{ env.GROCY_VERSION }}
         platforms: linux/amd64, linux/arm64/v8
         containerfiles: Containerfile-backend
@@ -33,7 +33,7 @@ jobs:
     - id: build-grocy-frontend
       uses: redhat-actions/buildah-build@v2.12
       with:
-        image: frontend
+        image: grocy-frontend
         tags: ${{ env.GROCY_IMAGE_TAG }} ${{ env.GROCY_VERSION }}
         platforms: linux/amd64, linux/arm64/v8
         containerfiles: Containerfile-frontend
@@ -44,7 +44,7 @@ jobs:
       with:
         image: ${{ steps.build-grocy-backend.outputs.image }}
         tags: ${{ steps.build-grocy-backend.outputs.tags }}
-        registry: docker.io/towo/grocy
+        registry: docker.io/towo
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
     - uses: redhat-actions/push-to-registry@v2.5
