@@ -1,9 +1,9 @@
 .PHONY: build run pod manifest manifest-create %-backend %-frontend
 
-GROCY_VERSION = v4.0.3
+GROCY_VERSION = v4.2.0
 IMAGE_TAG ?= $(shell git describe --tags --match 'v*' --dirty)
 
-IMAGE_PREFIX ?= docker.io/grocy
+IMAGE_PREFIX ?= docker.io/towo
 PLATFORM ?= linux/386 linux/amd64 linux/arm/v6 linux/arm/v7 linux/arm64/v8 linux/ppc64le linux/s390x
 
 build: manifest
@@ -15,13 +15,13 @@ create: pod
         --pod grocy-pod \
         --read-only \
         --volume app-db:/var/www/data \
-        ${IMAGE_PREFIX}/backend:${IMAGE_TAG}
+        ${IMAGE_PREFIX}/grocy-backend:${IMAGE_TAG}
 	podman create \
         --name frontend \
         --pod grocy-pod \
         --read-only \
         --tmpfs /tmp \
-        ${IMAGE_PREFIX}/frontend:${IMAGE_TAG}
+        ${IMAGE_PREFIX}/grocy-frontend:${IMAGE_TAG}
 
 run: create
 	podman pod start grocy-pod
@@ -36,17 +36,17 @@ pod:
 manifest: manifest-create $(PLATFORM)
 
 manifest-create:
-	buildah rmi -f ${IMAGE_PREFIX}/backend:${IMAGE_TAG} || true
-	buildah rmi -f ${IMAGE_PREFIX}/frontend:${IMAGE_TAG} || true
-	buildah manifest create ${IMAGE_PREFIX}/backend:${IMAGE_TAG}
-	buildah manifest create ${IMAGE_PREFIX}/frontend:${IMAGE_TAG}
+	buildah rmi -f ${IMAGE_PREFIX}/grocy-backend:${IMAGE_TAG} || true
+	buildah rmi -f ${IMAGE_PREFIX}/grocy-frontend:${IMAGE_TAG} || true
+	buildah manifest create ${IMAGE_PREFIX}/grocy-backend:${IMAGE_TAG}
+	buildah manifest create ${IMAGE_PREFIX}/grocy-frontend:${IMAGE_TAG}
 
 $(PLATFORM): %: %-backend %-frontend
 
-%-backend: GROCY_IMAGE = $(shell buildah bud --build-arg GROCY_VERSION=${GROCY_VERSION} --build-arg PLATFORM=$* --file Containerfile-backend --platform $* --quiet --tag ${IMAGE_PREFIX}/backend/$*:${IMAGE_TAG})
+%-backend: GROCY_IMAGE = $(shell buildah bud --build-arg GROCY_VERSION=${GROCY_VERSION} --build-arg PLATFORM=$* --file Containerfile-backend --platform $* --quiet --tag ${IMAGE_PREFIX}/grocy-backend/$*:${IMAGE_TAG})
 %-backend:
 	buildah manifest add ${IMAGE_PREFIX}/backend:${IMAGE_TAG} ${GROCY_IMAGE}
 
-%-frontend: NGINX_IMAGE = $(shell buildah bud --build-arg GROCY_VERSION=${GROCY_VERSION} --build-arg PLATFORM=$* --file Containerfile-frontend --platform $* --quiet --tag ${IMAGE_PREFIX}/frontend/$*:${IMAGE_TAG})
+%-frontend: NGINX_IMAGE = $(shell buildah bud --build-arg GROCY_VERSION=${GROCY_VERSION} --build-arg PLATFORM=$* --file Containerfile-frontend --platform $* --quiet --tag ${IMAGE_PREFIX}/grocy-frontend/$*:${IMAGE_TAG})
 %-frontend:
 	buildah manifest add ${IMAGE_PREFIX}/frontend:${IMAGE_TAG} ${NGINX_IMAGE}
