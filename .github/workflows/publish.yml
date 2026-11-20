@@ -14,15 +14,15 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     # Enable Ubuntu (jammy) repository packages, to ensure that a recent version of 'buildah' is available
-    - run: echo "deb http://archive.ubuntu.com/ubuntu/ jammy main universe" | sudo tee -a /etc/apt/sources.list
-    - run: echo "deb http://archive.ubuntu.com/ubuntu/ jammy-security main universe" | sudo tee -a /etc/apt/sources.list
+    - run: echo "deb http://archive.ubuntu.com/ubuntu/ resolute main universe" | sudo tee -a /etc/apt/sources.list
+    - run: echo "deb http://archive.ubuntu.com/ubuntu/ resolute-security main universe" | sudo tee -a /etc/apt/sources.list
     - run: sudo apt-get update
     - run: sudo apt-get install -y buildah qemu-user-static
     # Determine the grocy application version to bundle based on the image tag to publish
     - run: echo "GROCY_VERSION=${{ env.GROCY_IMAGE_TAG }}" | sed -e "s/-[0-9a-z]*$//" >> $GITHUB_ENV
     # Build multi-architecture container manifests
     - id: build-grocy-backend
-      uses: redhat-actions/buildah-build@v2.12
+      uses: redhat-actions/buildah-build@v3.1.0
       with:
         image: grocy-backend
         tags: ${{ env.GROCY_IMAGE_TAG }} ${{ env.GROCY_VERSION }}
@@ -36,7 +36,7 @@ jobs:
           org.opencontainers.image.version=${{ env.GROCY_IMAGE_TAG }}
           org.opencontainers.image.licenses=MIT
     - id: build-grocy-frontend
-      uses: redhat-actions/buildah-build@v2.12
+      uses: redhat-actions/buildah-build@v3.1.10
       with:
         image: grocy-frontend
         tags: ${{ env.GROCY_IMAGE_TAG }} ${{ env.GROCY_VERSION }}
@@ -50,14 +50,14 @@ jobs:
           org.opencontainers.image.version=${{ env.GROCY_IMAGE_TAG }}
           org.opencontainers.image.licenses=MIT
     # Publish the container manifests
-    - uses: redhat-actions/push-to-registry@v2.7
+    - uses: redhat-actions/push-to-registry@v3.0.0
       with:
         image: ${{ steps.build-grocy-backend.outputs.image }}
         tags: ${{ steps.build-grocy-backend.outputs.tags }}
         registry: docker.io/towo
         username: ${{ vars.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-    - uses: redhat-actions/push-to-registry@v2.7
+    - uses: redhat-actions/push-to-registry@v3.0.0
       with:
         image: ${{ steps.build-grocy-frontend.outputs.image }}
         tags: ${{ steps.build-grocy-frontend.outputs.tags }}
