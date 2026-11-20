@@ -36,7 +36,7 @@ jobs:
           org.opencontainers.image.version=${{ env.GROCY_IMAGE_TAG }}
           org.opencontainers.image.licenses=MIT
     - id: build-grocy-frontend
-      uses: redhat-actions/buildah-build@v3.1.10
+      uses: redhat-actions/buildah-build@v3.1.0
       with:
         image: grocy-frontend
         tags: ${{ env.GROCY_IMAGE_TAG }} ${{ env.GROCY_VERSION }}
