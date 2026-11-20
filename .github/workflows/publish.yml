@@ -17,7 +17,7 @@ jobs:
     - run: echo "deb http://archive.ubuntu.com/ubuntu/ resolute main universe" | sudo tee -a /etc/apt/sources.list
     - run: echo "deb http://archive.ubuntu.com/ubuntu/ resolute-security main universe" | sudo tee -a /etc/apt/sources.list
     - run: sudo apt-get update
-    - run: sudo apt-get install -y buildah qemu-user-static
+    - run: sudo apt-get install -y buildah qemu-user
     # Determine the grocy application version to bundle based on the image tag to publish
     - run: echo "GROCY_VERSION=${{ env.GROCY_IMAGE_TAG }}" | sed -e "s/-[0-9a-z]*$//" >> $GITHUB_ENV
     # Build multi-architecture container manifests
